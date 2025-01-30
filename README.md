@@ -1,4 +1,4 @@
-# **Cloudflare Magento 2 API Gateway Worker**
+# **Cloudflare 2 API Gateway Worker**
 
 A **Cloudflare Worker** to secure and optimize API requests to a **Magento 2 store**. This worker:
 - ✅ **Blocks unauthorized API requests** (requires `CF-API-Secret` header).
@@ -7,6 +7,20 @@ A **Cloudflare Worker** to secure and optimize API requests to a **Magento 2 sto
 - ✅ **Forwards allowed requests** to the Magento API.
 
 ---
+
+## ** Supported Platforms**
+ - Magento 1-2 and forks
+ - WordPress
+ - Shopify
+ - ORO Commerce
+ - Word Press
+ - Shopware 6
+ - Sylius
+ - ODO
+ - other platforms
+   
+---
+
 
 ## **🚀 Features**
 | Feature | Status |
