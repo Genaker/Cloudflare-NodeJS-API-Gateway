@@ -2,6 +2,7 @@
 const config = {
   magentoAPIUrl: false, // Magento Proxied API URL
   magentoKey: null,
+  workerSecret: null,
   ipLimit: 10,
   ipTimeWindow: 60,
   allowedPaths: [], // Define allowed endpoints to prevent abuse,
@@ -36,10 +37,16 @@ export default {
     // Fix HTTPS and remove all extra slashes
     proxyUrl = "https://" + proxyUrl.replace("https:/", "").split("//").join("/");
 
+    // Clone original request headers
+    const modifiedHeaders = new Headers(request.headers);
+
+    // Add custom headers
+    modifiedHeaders.set("CF-API-Secret", config.workerSecret);
+
     // Fetch the data from Magento API
     const response = await fetch(proxyUrl, {
       method: request.method,
-      headers: request.headers,
+      headers: modifiedHeaders,
       body: request.method !== "GET" ? await request.text() : null
     });
 
@@ -85,6 +92,8 @@ async function processConfig(env) {
     config.env = env,
       config.magentoAPIUrl = env.MAGENTO_API_URL || "https://default-magento-store.com/rest/V1/";
     config.magentoKey = env.MAGENTO_API_KEY || "default-api-key";
+    config.workerSecret = env.WORKER_SECRET || "12345";
+    
     config.ipLimit = env.IP_LIMIT || config.ipLimit;
     config.ipTimeWindow = env.IP_WINDOW || config.ipTimeWindow;
 
