@@ -13,6 +13,7 @@ const ipLimits = new Map(); // In-memory rate limit tracking
 
 export default {
   async fetch(request, env) {
+    const startTime = Date.now(); // Start profiling
     const url = new URL(request.url);
     console.log(url);
     const apiPath = url.pathname;
@@ -43,6 +44,9 @@ export default {
     // Add custom headers
     modifiedHeaders.set("CF-API-Secret", config.workerSecret);
 
+    const endTime = Date.now(); // End profiling
+    const processingTime = endTime - startTime;
+
     // Fetch the data from Magento API
     const response = await fetch(proxyUrl, {
       method: request.method,
@@ -50,8 +54,13 @@ export default {
       body: request.method !== "GET" ? await request.text() : null
     });
 
+    // Modify Response Headers with Profiling Data
+    const newResponse = new Response(response.body, response);
+
+    newResponse.headers.append("X-Work-Time", `${processingTime}ms`);
+
     // Return the Magento API response
-    return response;
+    return newResponse;
   }
 };
 
@@ -93,7 +102,7 @@ async function processConfig(env) {
       config.magentoAPIUrl = env.MAGENTO_API_URL || "https://default-magento-store.com/rest/V1/";
     config.magentoKey = env.MAGENTO_API_KEY || "default-api-key";
     config.workerSecret = env.WORKER_SECRET || "12345";
-    
+
     config.ipLimit = env.IP_LIMIT || config.ipLimit;
     config.ipTimeWindow = env.IP_WINDOW || config.ipTimeWindow;
 
